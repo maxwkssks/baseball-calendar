@@ -1,6 +1,14 @@
+import { db, doc, getDoc, setDoc } from "./firebase.js";
+
 const calendar = document.getElementById("calendar");
-// ✅ 배열 기반으로 일정 저장
-const eventData = {};
+let currentYear = 2025;
+let currentMonth = 6;
+let currentDate = "";
+let eventData = {};
+
+function updateMonthDisplay() {
+  document.getElementById("currentMonth").textContent = `${currentYear}년 ${currentMonth}월`;
+}
 
 function generateCalendar(year, month) {
   calendar.innerHTML = "";
@@ -20,31 +28,70 @@ function generateCalendar(year, month) {
     cell.onclick = () => selectDate(dateStr);
     date.setDate(date.getDate() + 1);
   }
+
+  updateMonthDisplay();
 }
 
-let currentDate = "";
+function prevMonth() {
+  currentMonth--;
+  if (currentMonth < 1) {
+    currentMonth = 12;
+    currentYear--;
+  }
+  generateCalendar(currentYear, currentMonth);
+}
 
-function selectDate(dateStr) {
+function nextMonth() {
+  currentMonth++;
+  if (currentMonth > 12) {
+    currentMonth = 1;
+    currentYear++;
+  }
+  generateCalendar(currentYear, currentMonth);
+}
+
+async function selectDate(dateStr) {
   currentDate = dateStr;
   document.getElementById("selectedDate").textContent = `📅 ${dateStr}`;
   document.getElementById("eventText").value = "";
+
+  const ref = doc(db, "schedules", dateStr);
+  const snap = await getDoc(ref);
+
+  if (snap.exists()) {
+    eventData[dateStr] = snap.data().events;
+  } else {
+    eventData[dateStr] = [];
+  }
+
   renderEventList();
 }
 
-function saveEvent() {
+async function saveEvent() {
   const text = document.getElementById("eventText").value.trim();
   if (!currentDate || !text) return alert("날짜 선택 후 내용을 입력하세요.");
-  
+
   if (!eventData[currentDate]) eventData[currentDate] = [];
-  eventData[currentDate].push(text); // ✅ 배열에 추가
+  eventData[currentDate].push(text);
+
+  const ref = doc(db, "schedules", currentDate);
+  await setDoc(ref, { events: eventData[currentDate] });
+
   document.getElementById("eventText").value = "";
   renderEventList();
 }
 
-function deleteEvent(index) {
+async function deleteEvent(index) {
   if (!eventData[currentDate]) return;
-  eventData[currentDate].splice(index, 1); // 배열에서 삭제
-  if (eventData[currentDate].length === 0) delete eventData[currentDate]; // 다 지워지면 항목 제거
+  eventData[currentDate].splice(index, 1);
+
+  const ref = doc(db, "schedules", currentDate);
+  if (eventData[currentDate].length === 0) {
+    await setDoc(ref, { events: [] });
+  } else {
+    await setDoc(ref, { events: eventData[currentDate] });
+  }
+
   renderEventList();
 }
 
@@ -59,16 +106,13 @@ function renderEventList() {
 
   eventData[currentDate].forEach((event, index) => {
     const div = document.createElement("div");
-    div.textContent = `📝 ${event} `;
-    
+    div.textContent = `📝 ${event}`;
     const btn = document.createElement("button");
     btn.textContent = "❌";
-    btn.style.marginLeft = "10px";
     btn.onclick = () => deleteEvent(index);
-    
     div.appendChild(btn);
     list.appendChild(div);
   });
 }
 
-generateCalendar(2025, 6);
+generateCalendar(currentYear, currentMonth);
