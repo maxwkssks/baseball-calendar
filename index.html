@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>야구 스케줄 캘린더</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>⚾ 야구 스케줄 캘린더</h1>
+  <table id="calendar"></table>
+
+  <div id="schedule">
+    <h3 id="selectedDate">📅 날짜를 선택하세요</h3>
+    <textarea id="eventText" placeholder="예: 오후 2시 | 잠실구장 | LG vs 두산"></textarea>
+    <button onclick="saveEvent()">✅ 저장</button>
+    <div id="eventList"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
