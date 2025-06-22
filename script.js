@@ -13,7 +13,7 @@ const nextBtn = document.getElementById("nextBtn");
 let currentYear = 2025;
 let currentMonth = 6;
 let currentDate = "";
-let eventData = {}; // { 날짜: [일정1, 일정2, ...] }
+let eventData = {};
 
 function updateMonthDisplay() {
   currentMonthText.textContent = `${currentYear}년 ${currentMonth}월`;
@@ -69,9 +69,9 @@ async function selectDate(dateStr) {
   try {
     const ref = doc(db, "schedules", dateStr);
     const snap = await getDoc(ref);
-    eventData[dateStr] = snap.exists() ? snap.data().events : [];
+    eventData[dateStr] = snap.exists() ? snap.data().events || [] : [];
   } catch (e) {
-    console.error("Firestore 읽기 오류:", e);
+    console.error("📛 Firestore 불러오기 오류:", e);
     eventData[dateStr] = [];
   }
 
@@ -80,47 +80,52 @@ async function selectDate(dateStr) {
 
 async function saveEvent() {
   const text = eventText.value.trim();
-  if (!currentDate || !text) return alert("날짜 선택 후 내용을 입력하세요.");
+  if (!currentDate || !text) {
+    alert("날짜를 선택하고 내용을 입력해주세요.");
+    return;
+  }
 
   if (!eventData[currentDate]) eventData[currentDate] = [];
   eventData[currentDate].push(text);
 
   try {
     await setDoc(doc(db, "schedules", currentDate), {
-      events: eventData[currentDate]
+      events: [...eventData[currentDate]]
     });
     eventText.value = "";
     renderEventList();
   } catch (e) {
-    console.error("Firestore 저장 오류:", e);
-    alert("❌ 저장에 실패했습니다.");
+    console.error("📛 Firestore 저장 오류:", e);
+    alert("❌ 저장 실패: 콘솔을 확인하세요.");
   }
 }
 
 async function deleteEvent(index) {
   if (!eventData[currentDate]) return;
+
   eventData[currentDate].splice(index, 1);
 
   try {
     await setDoc(doc(db, "schedules", currentDate), {
-      events: eventData[currentDate]
+      events: [...eventData[currentDate]]
     });
     renderEventList();
   } catch (e) {
-    console.error("Firestore 삭제 오류:", e);
-    alert("❌ 삭제에 실패했습니다.");
+    console.error("📛 Firestore 삭제 오류:", e);
+    alert("❌ 삭제 실패: 콘솔을 확인하세요.");
   }
 }
 
 function renderEventList() {
   eventList.innerHTML = "";
 
-  if (!eventData[currentDate] || eventData[currentDate].length === 0) {
+  const events = eventData[currentDate];
+  if (!events || events.length === 0) {
     eventList.textContent = "등록된 일정 없음";
     return;
   }
 
-  eventData[currentDate].forEach((event, index) => {
+  events.forEach((event, index) => {
     const div = document.createElement("div");
     div.textContent = `📝 ${event}`;
     const btn = document.createElement("button");
@@ -131,7 +136,7 @@ function renderEventList() {
   });
 }
 
-// ✅ 이벤트 리스너 등록
+// ✅ 버튼 이벤트 등록
 saveBtn.addEventListener("click", saveEvent);
 deleteBtn.addEventListener("click", () => {
   if (eventData[currentDate] && eventData[currentDate].length > 0) {
@@ -141,5 +146,5 @@ deleteBtn.addEventListener("click", () => {
 prevBtn.addEventListener("click", prevMonth);
 nextBtn.addEventListener("click", nextMonth);
 
-// ✅ 초기 달력 렌더링
+// ✅ 초기 달력 로드
 generateCalendar(currentYear, currentMonth);
