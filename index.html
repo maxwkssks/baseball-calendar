@@ -8,26 +8,29 @@
 <body>
   <h1>⚾ 야구 스케줄 캘린더</h1>
 
+  <!-- 🔽 월 이동 컨트롤 -->
   <div class="month-nav">
-    <button onclick="prevMonth()">← 이전 달</button>
+    <button id="prevBtn">← 이전 달</button>
     <span id="currentMonth">2025년 6월</span>
-    <button onclick="nextMonth()">다음 달 →</button>
+    <button id="nextBtn">다음 달 →</button>
   </div>
 
+  <!-- 📅 달력 테이블 -->
   <table id="calendar"></table>
 
+  <!-- 📝 일정 입력 영역 -->
   <div id="schedule">
     <h3 id="selectedDate">📅 날짜를 선택하세요</h3>
     <textarea id="eventText" placeholder="예: 오후 2시 | 잠실구장 | LG vs 두산"></textarea>
     <div class="btn-group">
-      <button onclick="saveEvent()">✅ 저장</button>
-      <button onclick="deleteEvent()">🗑️ 삭제</button>
+      <button id="saveBtn">✅ 저장</button>
+      <button id="deleteBtn">🗑️ 삭제</button>
     </div>
     <div id="eventList"></div>
   </div>
 
-  <!-- ✅ Firebase SDK -->
+  <!-- ✅ Firebase + 앱 스크립트 -->
   <script type="module" src="firebase.js"></script>
-  <script src="script.js" type="module"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>

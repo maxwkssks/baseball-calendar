@@ -1,7 +1,8 @@
-// Firebase 설정 및 Firestore 내보내기
+// ✅ Firebase SDK - Firestore 모듈 기반 초기화
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+// ✅ 네 firebaseConfig 정보
 const firebaseConfig = {
   apiKey: "AIzaSyCsKo_o-bHGFf3VYr3I11rLPkPXKeq0kPg",
   authDomain: "baseball-schedule-58a7d.firebaseapp.com",
@@ -12,7 +13,9 @@ const firebaseConfig = {
   measurementId: "G-N77LKB6BFJ"
 };
 
+// ✅ Firebase 앱과 Firestore 초기화
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// ✅ 외부에서 사용할 수 있게 export
 export { db, doc, getDoc, setDoc };
