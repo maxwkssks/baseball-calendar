@@ -73,6 +73,12 @@ textarea {
   border-radius: 5px;
 }
 
+.btn-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
 button {
   background-color: #007bff;
   color: white;
@@ -87,10 +93,39 @@ button:hover {
   background-color: #0056b3;
 }
 
+/* ✅ 일정 리스트 스타일 */
 #eventList {
   margin-top: 15px;
   padding: 10px;
   background-color: #f1f1f1;
   border-radius: 5px;
   white-space: pre-wrap;
+}
+
+#eventList div {
+  background-color: #f8f9fa;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#eventList div:hover {
+  background-color: #e9ecef;
+}
+
+#eventList button {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#eventList button:hover {
+  background: #b02a37;
 }

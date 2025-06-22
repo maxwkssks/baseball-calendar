@@ -1,4 +1,5 @@
 const calendar = document.getElementById("calendar");
+// ✅ 배열 기반으로 일정 저장
 const eventData = {};
 
 function generateCalendar(year, month) {
@@ -21,21 +22,53 @@ function generateCalendar(year, month) {
   }
 }
 
+let currentDate = "";
+
 function selectDate(dateStr) {
+  currentDate = dateStr;
   document.getElementById("selectedDate").textContent = `📅 ${dateStr}`;
-  document.getElementById("eventText").value = eventData[dateStr] || "";
-  document.getElementById("eventList").textContent = eventData[dateStr]
-    ? `📝 일정: ${eventData[dateStr]}`
-    : "등록된 일정 없음";
+  document.getElementById("eventText").value = "";
+  renderEventList();
 }
 
 function saveEvent() {
-  const dateStr = document.getElementById("selectedDate").textContent.replace("📅 ", "");
   const text = document.getElementById("eventText").value.trim();
-  if (!dateStr || !text) return alert("날짜 선택 후 내용을 입력하세요.");
-  eventData[dateStr] = text;
-  alert("✅ 저장 완료!");
-  selectDate(dateStr);
+  if (!currentDate || !text) return alert("날짜 선택 후 내용을 입력하세요.");
+  
+  if (!eventData[currentDate]) eventData[currentDate] = [];
+  eventData[currentDate].push(text); // ✅ 배열에 추가
+  document.getElementById("eventText").value = "";
+  renderEventList();
+}
+
+function deleteEvent(index) {
+  if (!eventData[currentDate]) return;
+  eventData[currentDate].splice(index, 1); // 배열에서 삭제
+  if (eventData[currentDate].length === 0) delete eventData[currentDate]; // 다 지워지면 항목 제거
+  renderEventList();
+}
+
+function renderEventList() {
+  const list = document.getElementById("eventList");
+  list.innerHTML = "";
+
+  if (!eventData[currentDate] || eventData[currentDate].length === 0) {
+    list.textContent = "등록된 일정 없음";
+    return;
+  }
+
+  eventData[currentDate].forEach((event, index) => {
+    const div = document.createElement("div");
+    div.textContent = `📝 ${event} `;
+    
+    const btn = document.createElement("button");
+    btn.textContent = "❌";
+    btn.style.marginLeft = "10px";
+    btn.onclick = () => deleteEvent(index);
+    
+    div.appendChild(btn);
+    list.appendChild(div);
+  });
 }
 
 generateCalendar(2025, 6);
